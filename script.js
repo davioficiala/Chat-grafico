@@ -1133,3 +1133,368 @@ last.volume>1000?
 
 
 }
+
+// ── Indicadores ──
+
+function atualizarIndicadores(){
+
+const last=candles[candles.length-1];
+
+if(!last)return;
+
+
+const ativo=ATIVOS[ativoIdx];
+
+const dp=ativo.step<1?4:2;
+
+
+const itens=[
+
+{
+nome:"MA 9",
+val:last.ma9?last.ma9.toFixed(dp):"--",
+desc:"Média Móvel Rápida"
+},
+
+{
+nome:"MA 21",
+val:last.ma21?last.ma21.toFixed(dp):"--",
+desc:"Média Móvel Lenta"
+},
+
+{
+nome:"RSI 14",
+val:last.rsi.toFixed(1),
+desc:"RSI"
+},
+
+{
+nome:"MACD",
+val:last.macd.toFixed(5),
+desc:"MACD Line"
+},
+
+{
+nome:"Signal",
+val:last.signal.toFixed(5),
+desc:"Signal Line"
+},
+
+{
+nome:"Volume",
+val:last.volume.toLocaleString("pt-BR"),
+desc:"Volume"
+}
+
+];
+
+
+document.getElementById("ind-lista").innerHTML=
+itens.map(it=>`
+
+<div class="ind-row">
+
+<div>
+
+<div class="ind-name">
+${it.nome}
+</div>
+
+<div class="ind-desc">
+${it.desc}
+</div>
+
+</div>
+
+
+<div class="ind-val">
+${it.val}
+</div>
+
+
+</div>
+
+`).join("");
+
+
+
+const prices=candles
+.slice(-20)
+.map(c=>c.close);
+
+
+const sup=Math.min(...prices).toFixed(dp);
+
+const res=Math.max(...prices).toFixed(dp);
+
+
+
+document.getElementById("sr-lista").innerHTML=`
+
+<div class="sr-row">
+
+<span>
+🟢 Suporte
+</span>
+
+<span class="ind-val">
+${sup}
+</span>
+
+</div>
+
+
+<div class="sr-row">
+
+<span>
+🔴 Resistência
+</span>
+
+<span class="ind-val">
+${res}
+</span>
+
+</div>
+
+`;
+
+}
+
+
+
+
+// ── Render geral ──
+
+function renderAll(){
+
+atualizarPreco();
+
+desenharMain();
+
+desenharVol();
+
+desenharRsi();
+
+atualizarSinal();
+
+atualizarEntrada();
+
+atualizarAnalise();
+
+atualizarIndicadores();
+
+}
+
+
+
+
+// ── Abas ──
+
+function setTab(id){
+
+document.querySelectorAll(".tab-content")
+.forEach(el=>el.classList.remove("active"));
+
+
+document.querySelectorAll(".tab-btn")
+.forEach(el=>el.classList.remove("active"));
+
+
+document.getElementById("tab-"+id)
+.classList.add("active");
+
+
+event.target.classList.add("active");
+
+
+if(id==="chart"){
+
+desenharMain();
+
+desenharVol();
+
+desenharRsi();
+
+}
+
+}
+
+
+
+// ── Tempo gráfico ──
+
+function setTf(btn,tf){
+
+document.querySelectorAll(".tf-btn")
+.forEach(b=>b.classList.remove("active"));
+
+
+btn.classList.add("active");
+
+}
+
+
+
+// ── Botões ativos ──
+
+const ativosEl=document.getElementById("ativos");
+
+
+ATIVOS.forEach((a,i)=>{
+
+
+const btn=document.createElement("button");
+
+
+btn.className=
+"ativo-btn"+
+(i===0?" active":"");
+
+
+btn.textContent=a.id;
+
+
+
+btn.onclick=()=>{
+
+
+ativoIdx=i;
+
+
+candles=gerarCandles(
+a.base,
+a.step
+);
+
+
+sinal=analisarIA(candles);
+
+
+
+document.querySelectorAll(".ativo-btn")
+.forEach(b=>b.classList.remove("active"));
+
+
+
+btn.classList.add("active");
+
+
+renderAll();
+
+
+};
+
+
+
+ativosEl.appendChild(btn);
+
+
+});
+
+
+
+
+// ── Relógio ──
+
+setInterval(()=>{
+
+document.getElementById("relogio")
+.textContent=
+new Date().toLocaleTimeString("pt-BR");
+
+
+},1000);
+
+
+
+// ── Atualização automática ──
+
+setInterval(()=>{
+
+
+const ativo=ATIVOS[ativoIdx];
+
+const last=candles[candles.length-1];
+
+
+const close=
+last.close+
+(Math.random()-0.48)*ativo.step*8;
+
+
+
+const novo={
+
+time:new Date()
+.toTimeString()
+.slice(0,5),
+
+open:last.close,
+
+high:Math.max(last.close,close),
+
+low:Math.min(last.close,close),
+
+close,
+
+volume:Math.floor(
+200+
+Math.random()*1800
+),
+
+ma9:0,
+ma21:0,
+rsi:50,
+macd:0,
+signal:0,
+bb_upper:0,
+bb_lower:0,
+bb_mid:0
+
+};
+
+
+
+candles=calcIndicadores([
+...candles.slice(-59),
+novo
+]);
+
+
+sinal=analisarIA(candles);
+
+
+renderAll();
+
+
+},3000);
+
+
+
+
+// ── Inicialização ──
+
+candles=
+gerarCandles(
+ATIVOS[0].base,
+ATIVOS[0].step
+);
+
+
+sinal=
+analisarIA(candles);
+
+
+
+window.addEventListener(
+"resize",
+()=>{
+desenharMain();
+desenharVol();
+desenharRsi();
+}
+);
+
+
+
+renderAll();
