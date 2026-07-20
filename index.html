@@ -1,0 +1,608 @@
+
+
+  
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brain Trader IA</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:#0d1117;color:#e6edf3;min-height:100vh;display:flex;flex-direction:column;}
+
+/* Header */
+header{background:#161b22;border-bottom:1px solid #30363d;padding:10px 16px;}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.logo{display:flex;align-items:center;gap:10px;}
+.logo-title{font-weight:700;font-size:16px;}
+.logo-sub{font-size:10px;color:#8b949e;}
+.relogio{font-family:monospace;font-size:14px;color:#58a6ff;text-align:right;}
+.relogio-sub{font-size:10px;color:#8b949e;}
+.carregando{font-size:10px;color:#f59e0b;margin-top:2px;}
+
+/* Ativos */
+.ativos{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;}
+.ativo-btn{padding:4px 12px;border-radius:6px;border:1px solid #30363d;background:transparent;color:#8b949e;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;}
+.ativo-btn.active{border-color:#58a6ff;background:#1f3a5e;color:#58a6ff;}
+
+/* Preço */
+.preco-bar{background:#161b22;border-bottom:1px solid #30363d;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.preco-atual{font-size:26px;font-weight:800;font-family:monospace;}
+.preco-diff{font-size:13px;font-weight:700;}
+.preco-hl{font-size:10px;color:#8b949e;margin-top:2px;}
+.sinal-badge{padding:7px 14px;border-radius:8px;text-align:center;border:1px solid;min-width:110px;}
+.sinal-label{font-size:10px;color:#8b949e;}
+.sinal-tipo{font-size:14px;font-weight:800;}
+.sinal-forca{font-size:10px;}
+
+/* Tabs */
+.tabs{display:flex;border-bottom:1px solid #30363d;background:#161b22;}
+.tab-btn{flex:1;padding:9px 4px;border:none;background:transparent;color:#8b949e;font-size:11px;font-weight:600;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid transparent;transition:all .15s;}
+.tab-btn.active{color:#e6edf3;border-bottom-color:#58a6ff;}
+
+/* Content */
+main{flex:1;padding:12px;overflow-y:auto;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* Chart */
+.tf-row{display:flex;gap:6px;margin-bottom:10px;align-items:center;flex-wrap:wrap;}
+.tf-btn{padding:3px 10px;border-radius:5px;border:1px solid #30363d;background:transparent;color:#8b949e;font-size:11px;cursor:pointer;transition:all .15s;}
+.tf-btn.active{border-color:#58a6ff;background:#1f3a5e;color:#58a6ff;}
+.chart-box{background:#0d1117;border-radius:8px;border:1px solid #30363d;padding:10px 6px 6px;margin-bottom:10px;}
+.chart-title{font-size:10px;color:#8b949e;margin-bottom:6px;margin-left:4px;}
+canvas{display:block;width:100%;}
+.legend{display:flex;gap:12px;padding:4px 6px;flex-wrap:wrap;margin-top:4px;}
+.leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:#8b949e;}
+.leg-dot{width:10px;height:3px;border-radius:2px;display:inline-block;}
+
+/* IA tab */
+.sinal-card{border-radius:12px;padding:18px;text-align:center;border:2px solid;margin-bottom:12px;}
+.sinal-main{font-size:36px;font-weight:900;letter-spacing:2px;margin:6px 0;}
+.forca-bar-wrap{max-width:260px;margin:10px auto;}
+.forca-label{display:flex;justify-content:space-between;font-size:10px;color:#8b949e;margin-bottom:4px;}
+.forca-track{background:#21262d;border-radius:10px;height:8px;overflow:hidden;}
+.forca-fill{height:100%;border-radius:10px;transition:width .5s;}
+.sinal-motivo{font-size:11px;color:#8b949e;margin-top:8px;}
+
+.entrada-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.entrada-box{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:12px;text-align:center;}
+.entrada-label{font-size:10px;color:#8b949e;}
+.entrada-val{font-size:13px;font-weight:700;font-family:monospace;margin-top:2px;}
+
+.analise-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:14px;margin-bottom:12px;}
+.analise-title{font-weight:700;font-size:13px;margin-bottom:10px;}
+.analise-row{display:flex;justify-content:space-between;border-bottom:1px solid #21262d;padding:7px 0;font-size:12px;}
+.analise-row:last-child{border-bottom:none;}
+.analise-key{color:#8b949e;}
+.analise-val{font-weight:600;}
+
+.aviso{background:#1c1200;border:1px solid #f59e0b40;border-radius:10px;padding:12px;}
+.aviso-title{font-size:11px;color:#f59e0b;font-weight:600;margin-bottom:4px;}
+.aviso-txt{font-size:11px;color:#8b949e;line-height:1.6;}
+
+/* Indicadores tab */
+.ind-title{font-weight:700;font-size:12px;color:#8b949e;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+.ind-row{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.ind-name{font-size:13px;font-weight:700;}
+.ind-desc{font-size:11px;color:#8b949e;}
+.ind-val{font-size:16px;font-weight:800;font-family:monospace;}
+.sr-row{border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;border:1px solid;}
+
+footer{background:#161b22;border-top:1px solid #30363d;padding:10px 16px;text-align:center;font-size:10px;color:#8b949e;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div class="logo">
+      <span style="font-size:22px">📈</span>
+      <div>
+        <div class="logo-title">Brain Trader IA</div>
+        <div class="logo-sub">Análise com inteligência artificial — Dados Reais</div>
+      </div>
+    </div>
+    <div>
+      <div class="relogio" id="relogio">00:00:00</div>
+      <div class="relogio-sub" style="text-align:right">Tempo real</div>
+      <div class="carregando" id="status-api">Conectando...</div>
+    </div>
+  </div>
+  <div class="ativos" id="ativos"></div>
+</header>
+
+<div class="preco-bar">
+  <div>
+    <div style="font-size:11px;color:#8b949e" id="ativo-label">Mini Dólar (WDO)</div>
+    <div class="preco-atual" id="preco-atual" style="color:#26a17b">--</div>
+  </div>
+  <div style="text-align:right">
+    <div class="preco-diff" id="preco-diff">-- (--%)</div>
+    <div class="preco-hl" id="preco-hl">H: -- · L: --</div>
+  </div>
+  <div class="sinal-badge" id="sinal-badge" style="border-color:#f59e0b;background:#1c1200">
+    <div class="sinal-label">Sinal IA</div>
+    <div class="sinal-tipo" id="sinal-tipo" style="color:#f59e0b">--</div>
+    <div class="sinal-forca" id="sinal-forca-top" style="color:#f59e0b">--%</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="setTab('chart')">📊 Gráfico</button>
+  <button class="tab-btn" onclick="setTab('ia')">🤖 IA</button>
+  <button class="tab-btn" onclick="setTab('indicadores')">📉 Indicadores</button>
+</div>
+
+<main>
+
+  <!-- GRÁFICO -->
+  <div class="tab-content active" id="tab-chart">
+    <div class="tf-row">
+      <button class="tf-btn active" onclick="setTf(this,'1m')">1m</button>
+      <button class="tf-btn" onclick="setTf(this,'5m')">5m</button>
+      <button class="tf-btn" onclick="setTf(this,'15m')">15m</button>
+      <button class="tf-btn" onclick="setTf(this,'1h')">1h</button>
+      <span style="margin-left:auto;font-size:10px;color:#8b949e" id="candle-count"></span>
+    </div>
+
+    <div class="chart-box">
+      <div class="chart-title">Candles + MA9 + MA21 + Bollinger</div>
+      <canvas id="cvMain" height="220"></canvas>
+      <div class="legend">
+        <div class="leg-item"><span class="leg-dot" style="background:#f59e0b"></span>MA9</div>
+        <div class="leg-item"><span class="leg-dot" style="background:#818cf8"></span>MA21</div>
+        <div class="leg-item"><span class="leg-dot" style="background:#6366f1"></span>Bollinger</div>
+        <div class="leg-item"><span class="leg-dot" style="background:#26a17b"></span>Alta</div>
+        <div class="leg-item"><span class="leg-dot" style="background:#ef4444"></span>Baixa</div>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <div class="chart-title">Volume</div>
+      <canvas id="cvVol" height="60"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <div class="chart-title" id="rsi-title">RSI (14) — --</div>
+      <canvas id="cvRsi" height="70"></canvas>
+    </div>
+  </div>
+
+  <!-- IA -->
+  <div class="tab-content" id="tab-ia">
+    <div class="sinal-card" id="sinal-card" style="border-color:#f59e0b;background:#1c1200">
+      <div style="font-size:12px;color:#8b949e;margin-bottom:4px">SINAL DA IA</div>
+      <div class="sinal-main" id="sinal-main" style="color:#f59e0b">⏸ AGUARDAR</div>
+      <div class="forca-bar-wrap">
+        <div class="forca-label"><span>Força do sinal</span><span id="sinal-forca-pct">0%</span></div>
+        <div class="forca-track"><div class="forca-fill" id="forca-fill" style="width:0%;background:#f59e0b"></div></div>
+      </div>
+      <div class="sinal-motivo" id="sinal-motivo">Carregando dados da API...</div>
+    </div>
+
+    <div class="entrada-grid" id="entrada-grid" style="display:none">
+      <div class="entrada-box">
+        <div class="entrada-label">Entrada</div>
+        <div class="entrada-val" id="entrada-val" style="color:#58a6ff">--</div>
+      </div>
+      <div class="entrada-box">
+        <div class="entrada-label">Stop</div>
+        <div class="entrada-val" id="stop-val" style="color:#ef4444">--</div>
+      </div>
+      <div class="entrada-box">
+        <div class="entrada-label">Alvo</div>
+        <div class="entrada-val" id="alvo-val" style="color:#26a17b">--</div>
+      </div>
+    </div>
+
+    <div class="analise-card">
+      <div class="analise-title">🧠 Análise Completa</div>
+      <div class="analise-row"><span class="analise-key">Tendência MA</span><span class="analise-val" id="a-tendencia">--</span></div>
+      <div class="analise-row"><span class="analise-key">RSI (14)</span><span class="analise-val" id="a-rsi">--</span></div>
+      <div class="analise-row"><span class="analise-key">MACD</span><span class="analise-val" id="a-macd">--</span></div>
+      <div class="analise-row"><span class="analise-key">Bollinger</span><span class="analise-val" id="a-boll">--</span></div>
+      <div class="analise-row"><span class="analise-key">Candle</span><span class="analise-val" id="a-candle">--</span></div>
+      <div class="analise-row"><span class="analise-key">Volume</span><span class="analise-val" id="a-vol">--</span></div>
+    </div>
+
+    <div class="aviso">
+      <div class="aviso-title">⚠ Aviso de risco</div>
+      <div class="aviso-txt">Esta análise é gerada por algoritmos. Nunca opere sem gerenciamento de risco. Use stop loss sempre. Resultados passados não garantem resultados futuros.</div>
+    </div>
+  </div>
+
+  <!-- INDICADORES -->
+  <div class="tab-content" id="tab-indicadores">
+    <div class="ind-title">Indicadores Técnicos</div>
+    <div id="ind-lista"></div>
+    <div class="ind-title" style="margin-top:8px">Suporte & Resistência</div>
+    <div id="sr-lista"></div>
+  </div>
+
+</main>
+
+<footer>Brain Trader IA © 2026 — Davi Walker · Dados via API · Não é recomendação de investimento</footer>
+
+<script>
+// ========== SUA CHAVE API ==========
+const API_KEY = "f2c71f3ac827461787c0cf240d6b9314";
+
+// ========== CONFIGURAÇÃO DOS ATIVOS ==========
+const ATIVOS=[
+  {id:"WDO",label:"Mini Dólar (WDO)",ticker:"WDOH26",base:5.72,step:0.0005,tipo:"derivativo"},
+  {id:"WIN",label:"Mini Índice (WIN)",ticker:"WINM26",base:132500,step:50,tipo:"derivativo"},
+  {id:"PETR4",label:"PETR4",ticker:"PETR4.SA",base:38.5,step:0.05,tipo:"acao"},
+  {id:"VALE3",label:"VALE3",ticker:"VALE3.SA",base:62.3,step:0.05,tipo:"acao"},
+];
+
+let ativoIdx=0, candles=[], sinal=null, tempoGrafico='1m', apiTipo='brapi';
+
+// ========== BUSCAR DADOS REAIS NA API ==========
+async function buscarDadosAPI(){
+  const ativo=ATIVOS[ativoIdx];
+  const statusEl=document.getElementById('status-api');
+  statusEl.textContent='Buscando dados...'; statusEl.style.color='#58a6ff';
+
+  try{
+    // Opção 1: Brapi.dev (melhor para B3)
+    if(apiTipo==='brapi'){
+      const res=await fetch(`https://brapi.dev/api/quote/${ativo.ticker}?interval=1m&range=1d&token=${API_KEY}`);
+      if(!res.ok) throw new Error(`Erro API: ${res.status}`);
+      const dados=await res.json();
+      if(!dados.results||!dados.results[0]) throw new Error('Sem dados para esse ativo');
+      
+      const historico=dados.results[0].historicalDataPrice||[];
+      candles=historico.map(d=>({
+        time:new Date(d.date*1000).toLocaleTimeString("pt-BR",{hour:'2-digit',minute:'2-digit'}),
+        open:d.open,high:d.high,low:d.low,close:d.close,volume:d.volume,
+        ma9:0,ma21:0,rsi:50,macd:0,signal:0,bb_upper:0,bb_lower:0,bb_mid:0
+      }));
+    }
+    // Opção 2: Alpha Vantage (sua chave)
+    else{
+      const res=await fetch(`https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${ativo.ticker}&interval=1min&apikey=${API_KEY}&outputsize=compact`);
+      if(!res.ok) throw new Error(`Erro API: ${res.status}`);
+      const dados=await res.json();
+      if(dados['Note']||dados['Information']) throw new Error(dados['Note']||dados['Information']);
+      
+      const serie=dados['Time Series (1min)'];
+      if(!serie) throw new Error('Sem dados de intraday');
+      
+      candles=Object.entries(serie).map(([hora,d])=>({
+        time:hora.split(' ')[1].substring(0,5),
+        open:parseFloat(d['1. open']),
+        high:parseFloat(d['2. high']),
+        low:parseFloat(d['3. low']),
+        close:parseFloat(d['4. close']),
+        volume:parseInt(d['5. volume']),
+        ma9:0,ma21:0,rsi:50,macd:0,signal:0,bb_upper:0,bb_lower:0,bb_mid:0
+      })).reverse();
+    }
+
+    candles=calcIndicadores(candles.slice(-60));
+    sinal=analisarIA(candles);
+    statusEl.textContent='✅ Dados atualizados'; statusEl.style.color='#26a17b';
+    renderAll();
+  }catch(erro){
+    console.warn('Erro na API, usando dados simulados:',erro.message);
+    statusEl.textContent='⚠️ Usando dados simulados'; statusEl.style.color='#f59e0b';
+    candles=gerarCandles(ativo.base,ativo.step);
+    sinal=analisarIA(candles);
+    renderAll();
+  }
+}
+
+// ========== FUNÇÕES ORIGINAIS (CÁLCULOS E DESENHOS) ==========
+function gerarCandles(base,step,n=60){
+  const arr=[];let preco=base;const now=Date.now();
+  for(let i=n;i>=0;i--){
+    const vol=(Math.random()-0.48)*step*8;
+    const open=preco,close=open+vol;
+    const high=Math.max(open,close)+Math.random()*step*3;
+    const low=Math.min(open,close)-Math.random()*step*3;
+    const t=new Date(now-i*60000);
+    arr.push({time:t.toTimeString().slice(0,5),open,high,low,close,volume:Math.floor(200+Math.random()*1800),ma9:0,ma21:0,rsi:50,macd:0,signal:0,bb_upper:0,bb_lower:0,bb_mid:0});
+    preco=close;
+  }
+  return calcIndicadores(arr);
+}
+
+function calcIndicadores(c){
+  for(let i=0;i<c.length;i++){
+    if(i>=8) c[i].ma9=c.slice(i-8,i+1).reduce((s,x)=>s+x.close,0)/9;
+    if(i>=20)c[i].ma21=c.slice(i-20,i+1).reduce((s,x)=>s+x.close,0)/21;
+  }
+  for(let i=14;i<c.length;i++){
+    let g=0,l=0;
+    for(let j=i-13;j<=i;j++){const d=c[j].close-c[j>0?j-1:0].close;if(d>0)g+=d;else l-=d;}
+    c[i].rsi=100-100/(1+g/(l||0.001));
+  }
+  const ema=(arr,p)=>{const k=2/(p+1);let e=arr[0];return arr.map(v=>{e=v*k+e*(1-k);return e;});};
+  const cl=c.map(x=>x.close);
+  const e12=ema(cl,12),e26=ema(cl,26);
+  const ml=e12.map((v,i)=>v-e26[i]),sl=ema(ml,9);
+  c.forEach((x,i)=>{x.macd=ml[i];x.signal=sl[i];});
+  for(let i=20;i<c.length;i++){
+    const s=c.slice(i-19,i+1).map(x=>x.close);
+    const mid=s.reduce((a,v)=>a+v,0)/20;
+    const std=Math.sqrt(s.reduce((a,v)=>a+(v-mid)**2,0)/20);
+    c[i].bb_mid=mid;c[i].bb_upper=mid+2*std;c[i].bb_lower=mid-2*std;
+  }
+  return c;
+}
+
+function analisarIA(c){
+  const u=c[c.length-1],p=c[c.length-2]||u;
+  let score=0;const mot=[];
+  if(u.ma9>u.ma21&&p.ma9<=p.ma21){score+=30;mot.push("Cruzamento altista MA9×MA21");}
+  else if(u.ma9<u.ma21&&p.ma9>=p.ma21){score-=30;mot.push("Cruzamento baixista MA9×MA21");}
+  else if(u.ma9>u.ma21){score+=10;mot.push("MA9 acima da MA21");}
+  else{score-=10;mot.push("MA9 abaixo da MA21");}
+  if(u.rsi<30){score+=25;mot.push(`RSI ${u.rsi.toFixed(1)} — sobrevendido`);}
+  else if(u.rsi>70){score-=25;mot.push(`RSI ${u.rsi.toFixed(1)} — sobrecomprado`);}
+  else if(u.rsi>50){score+=8;mot.push(`RSI ${u.rsi.toFixed(1)} — momentum altista`);}
+  else{score-=8;mot.push(`RSI ${u.rsi.toFixed(1)} — momentum baixista`);}
+  if(u.macd>u.signal&&p.macd<=p.signal){score+=20;mot.push("MACD cruzou acima da signal");}
+  if(u.macd<u.signal&&p.macd>=p.signal){score-=20;mot.push("MACD cruzou abaixo da signal");}
+  if(u.close<u.bb_lower&&u.bb_lower>0){score+=15;mot.push("Preço na banda inferior");}
+  if(u.close>u.bb_upper&&u.bb_upper>0){score-=15;mot.push("Preço na banda superior");}
+  const corpo=Math.abs(u.close-u.open),sombra=u.high-u.low;
+  if(u.close>u.open&&corpo>sombra*.6){score+=10;mot.push("Candle de alta forte");}
+  if(u.close<u.open&&corpo>sombra*.6){score-=10;mot.push("Candle de baixa forte");}
+  const forca=Math.min(Math.abs(score),100);
+  const step=Math.max(u.high-u.low,ativo.step*2);
+  if(score>=25)return{tipo:"COMPRA",forca,motivo:mot.slice(0,3).join(" · "),entrada:u.close,stop:u.close-step*2,alvo:u.close+step*3};
+  if(score<=-25)return{tipo:"VENDA",forca,motivo:mot.slice(0,3).join(" · "),entrada:u.close,stop:u.close+step*2,alvo:u.close-step*3};
+  return{tipo:"AGUARDAR",forca,motivo:mot.slice(0,2).join(" · "),entrada:u.close,stop:0,alvo:0};
+}
+
+function desenharMain(){
+  const cv=document.getElementById("cvMain");
+  cv.width=cv.offsetWidth||360;
+  const ctx=cv.getContext("2d");
+  const d=candles.slice(-40);
+  const W=cv.width,H=cv.height||220;
+  ctx.clearRect(0,0,W,H);
+  if(!d.length) return;
+  const prices=d.flatMap(c=>[c.high,c.low,c.ma9||c.close,c.ma21||c.close,c.bb_upper||c.close,c.bb_lower||c.close]).filter(v=>v>0);
+  const minP=Math.min(...prices),maxP=Math.max(...prices);
+  const range=maxP-minP||1;
+  const pad={t:10,b:20,l:48,r:8};
+  const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+  const toY=v=>pad.t+cH-(v-minP)/range*cH;
+  const bw=Math.max(2,Math.floor(cW/d.length)-2);
+  const bx=i=>pad.l+i*(cW/d.length)+cW/d.length/2;
+
+  ctx.strokeStyle="#21262d";ctx.lineWidth=1;
+  for(let i=0;i<4;i++){const y=pad.t+i*cH/3;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();}
+
+  ctx.beginPath();ctx.strokeStyle="#6366f130";ctx.lineWidth=1;ctx.setLineDash([4,2]);
+  d.forEach((c,i)=>{if(c.bb_upper>0){const x=bx(i),y=toY(c.bb_upper);i===0||!d[i-1].bb_upper?ctx.moveTo(x,y):ctx.lineTo(x,y);}});
+  ctx.stroke();
+  ctx.beginPath();
+  d.forEach((c,i)=>{if(c.bb_lower>0){const x=bx(i),y=toY(c.bb_lower);i===0||!d[i-1].bb_lower?ctx.moveTo(x,y):ctx.lineTo(x,y);}});
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.beginPath();ctx.strokeStyle="#f59e0b";ctx.lineWidth=1.5;
+  d.forEach((c,i)=>{if(c.ma9>0){const x=bx(i),y=toY(c.ma9);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}});
+  ctx.stroke();
+  ctx.beginPath();ctx.strokeStyle="#818cf8";ctx.lineWidth=1.5;
+  d.forEach((c,i)=>{if(c.ma21>0){const x=bx(i),y=toY(c.ma21);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}});
+  ctx.stroke();
+
+  d.forEach((c,i)=>{
+    const alta=c.close>=c.open;
+    const cor=alta?"#26a17b":"#ef4444";
+    const x=bx(i);
+    const yH=toY(c.high),yL=toY(c.low);
+    const yO=toY(c.open),yC=toY(c.close);
+    ctx.strokeStyle=cor;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,yH);ctx.lineTo(x,yL);ctx.stroke();
+    ctx.fillStyle=cor;
+    const bodyY=Math.min(yO,yC),bodyH=Math.max(Math.abs(yC-yO),1);
+    ctx.fillRect(x-bw/2,bodyY,bw,bodyH);
+  });
+
+  ctx.fillStyle="#8b949e";ctx.font="9px monospace";ctx.textAlign="right";
+  const ativo=ATIVOS[ativoIdx];
+  for(let i=0;i<=3;i++){
+    const v=minP+range*i/3;
+    ctx.fillText(v.toFixed(ativo.step<1?3:0),pad.l-4,pad.t+cH-i*cH/3+3);
+  }
+  ctx.textAlign="center";
+  d.forEach((c,i)=>{if(i%10===0)ctx.fillText(c.time,bx(i),H-4);});
+}
+
+function desenharVol(){
+  const cv=document.getElementById("cvVol");
+  cv.width=cv.offsetWidth||360;
+  const ctx=cv.getContext("2d"),d=candles.slice(-40);
+  const W=cv.width,H=cv.height||60;
+  ctx.clearRect(0,0,W,H);
+  if(!d.length) return;
+  const maxV=Math.max(...d.map(c=>c.volume))||1;
+  const pad={l:8,r:8};const cW=W-pad.l-pad.r;
+  d.forEach((c,i)=>{
+    const x=pad.l+i*(cW/d.length);
+    const bw=Math.max(1,cW/d.length-2);
+    const bh=c.volume/maxV*(H-4);
+    ctx.fillStyle=c.close>=c.open?"#26a17b66":"#ef444466";
+    ctx.fillRect(x,H-bh,bw,bh);
+  });
+}
+
+function desenharRsi(){
+  const cv=document.getElementById("cvRsi");
+  cv.width=cv.offsetWidth||360;
+  const ctx=cv.getContext("2d"),d=candles.slice(-40);
+  const W=cv.width,H=cv.height||70;
+  ctx.clearRect(0,0,W,H);
+  if(!d.length) return;
+  const pad={l:28,r:8,t:4,b:4};
+  const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+  const toY=v=>pad.t+cH-(v/100)*cH;
+
+  ctx.fillStyle="#ef444412";ctx.fillRect(pad.l,pad.t,cW,toY(70)-pad.t);
+  ctx.fillStyle="#26a17b12";ctx.fillRect(pad.l,toY(30),cW,cH-(toY(30)-pad.t));
+
+  [30,50,70].forEach(v=>{
+    ctx.strokeStyle=v===50?"#30363d":"#ef444430";if(v===30)ctx.strokeStyle="#26a17b30";
+    ctx.lineWidth=1;ctx.setLineDash([4,2]);
+    ctx.beginPath();ctx.moveTo(pad.l,toY(v));ctx.lineTo(W-pad.r,toY(v));ctx.stroke();
+  });
+  ctx.setLineDash([]);
+
+  const bw=Math.max(1,cW/d.length-2);
+  d.forEach((c,i)=>{
+    const x=pad.l+i*(cW/d.length);
+    const cor=c.rsi>70?"#ef4444":c.rsi<30?"#26a17b":"#6366f1";
+    const y=toY(c.rsi),bh=H-pad.b-y;
+    ctx.fillStyle=cor+"aa";ctx.fillRect(x,y,bw,bh);
+  });
+
+  ctx.fillStyle="#8b949e";ctx.font="9px monospace";ctx.textAlign="right";
+  [30,50,70].forEach(v=>ctx.fillText(v,pad.l-3,toY(v)+3));
+
+  const last=candles[candles.length-1];
+  document.getElementById("rsi-title").textContent=`RSI (14) — ${last?last.rsi.toFixed(1):"--"}`;
+}
+
+function atualizarPreco(){
+  const ativo=ATIVOS[ativoIdx];
+  const last=candles[candles.length-1];
+  const prev=candles[candles.length-2]||last;
+  if(!last)return;
+  const dp=ativo.step<1?4:0;
+  const diff=prev?last.close-prev.close:0;
+  const pct=prev?((diff/prev.close)*100):0;
+  const alta=diff>=0;
+  document.getElementById("ativo-label").textContent=ativo.label;
+  document.getElementById("preco-atual").textContent=last.close.toFixed(dp);
+  document.getElementById("preco-atual").style.color=alta?"#26a17b":"#ef4444";
+  document.getElementById("preco-diff").textContent=`${alta?"▲":"▼"} ${Math.abs(diff).toFixed(dp)} (${alta?"+":""}${pct.toFixed(2)}%)`;
+  document.getElementById("preco-diff").style.color=alta?"#26a17b":"#ef4444";
+  document.getElementById("preco-hl").textContent=`H: ${last.high.toFixed(dp)} · L: ${last.low.toFixed(dp)}`;
+  document.getElementById("candle-count").textContent=`${Math.min(candles.length,40)} candles`;
+}
+
+function atualizarSinal(){
+  if(!sinal)return;
+  const cor=sinal.tipo==="COMPRA"?"#26a17b":sinal.tipo==="VENDA"?"#ef4444":"#f59e0b";
+  const bg=sinal.tipo==="COMPRA"?"#052e1c":sinal.tipo==="VENDA"?"#1f0a0a":"#1c1200";
+  const txt=sinal.tipo==="COMPRA"?"⬆ COMPRA":sinal.tipo==="VENDA"?"⬇ VENDA":"⏸ AGUARDAR";
+
+  document.getElementById("sinal-badge").style.borderColor=cor;
+  document.getElementById("sinal-badge").style.background=bg;
+  document.getElementById("sinal-tipo").textContent=sinal.tipo;
+  document.getElementById("sinal-tipo").style.color=cor;
+  document.getElementById("sinal-forca-top").textContent=sinal.forca+"%";
+  document.getElementById("sinal-forca-top").style.color=cor;
+
+  document.getElementById("sinal-card").style.borderColor=cor;
+  document.getElementById("sinal-card").style.background=bg;
+  document.getElementById("sinal-main").textContent=txt;
+  document.getElementById("sinal-main").style.color=cor;
+  document.getElementById("sinal-forca-pct").textContent=sinal.forca+"%";
+  document.getElementById("forca-fill").style.width=sinal.forca+"%";
+  document.getElementById("forca-fill").style.background=cor;
+  document.getElementById("sinal-motivo").textContent=sinal.motivo;
+
+  const ativo=ATIVOS[ativoIdx];const dp=ativo.step<1?4:0;
+  const grid=document.getElementById("entrada-grid");
+  grid.style.display=sinal.tipo!=="AGUARDAR"?"grid":"none";
+  document.getElementById("entrada-val").textContent=sinal.entrada.toFixed(dp);
+  document.getElementById("stop-val").textContent=sinal.stop.toFixed(dp);
+  document.getElementById("alvo-val").textContent=sinal.alvo.toFixed(dp);
+}
+
+function atualizarAnalise(){
+  const last=candles[candles.length-1];if(!last)return;
+  const set=(id,txt,cor)=>{const el=document.getElementById(id);el.textContent=txt;el.style.color=cor;};
+  set("a-tendencia",last.ma9>last.ma21?"ALTA ▲":"BAIXA ▼",last.ma9>last.ma21?"#26a17b":"#ef4444");
+  set("a-rsi",`${last.rsi.toFixed(1)} — ${last.rsi>70?"Sobrecomprado":last.rsi<30?"Sobrevendido":"Neutro"}`,last.rsi>70?"#ef4444":last.rsi<30?"#26a17b":"#f59e0b");
+  set("a-macd",last.macd>last.signal?"Acima da signal ▲":"Abaixo da signal ▼",last.macd>last.signal?"#26a17b":"#ef4444");
+  set("a-boll",last.close>last.bb_upper?"Acima da banda":last.close<last.bb_lower?"Abaixo da banda":"Dentro das bandas",last.close>last.bb_upper?"#ef4444":last.close<last.bb_lower?"#26a17b":"#8b949e");
+  set("a-candle",last.close>last.open?"Alta 🟢":"Baixa 🔴",last.close>last.open?"#26a17b":"#ef4444");
+  set("a-vol",last.volume>100000?"Alto 🔊":"Baixo 🔇",last.volume>100000?"#58a6ff":"#8b949e");
+}
+
+function atualizarIndicadores(){
+  const last=candles[candles.length-1];if(!last)return;
+  const ativo=ATIVOS[ativoIdx];const dp=ativo.step<1?4:0;
+  const itens=[
+    {nome:"MA 9",val:last.ma9?last.ma9.toFixed(dp):"--",desc:"Média Móvel Rápida",cor:"#f59e0b"},
+    {nome:"MA 21",val:last.ma21?last.ma21.toFixed(dp):"--",desc:"Média Móvel Lenta",cor:"#818cf8"},
+    {nome:"RSI 14",val:last.rsi.toFixed(1),desc:last.rsi>70?"Sobrecomprado":last.rsi<30?"Sobrevendido":"Neutro",cor:last.rsi>70?"#ef4444":last.rsi<30?"#26a17b":"#8b949e"},
+    {nome:"MACD",val:last.macd.toFixed(5),desc:"MACD Line",cor:last.macd>=0?"#26a17b":"#ef4444"},
+    {nome:"Signal",val:last.signal.toFixed(5),desc:"Signal Line",cor:"#f59e0b"},
+    {nome:"BB Upper",val:last.bb_upper?last.bb_upper.toFixed(dp):"--",desc:"Banda Superior",cor:"#6366f1"},
+    {nome:"BB Mid",val:last.bb_mid?last.bb_mid.toFixed(dp):"--",desc:"Banda Média",cor:"#6366f1"},
+    {nome:"BB Lower",val:last.bb_lower?last.bb_lower.toFixed(dp):"--",desc:"Banda Inferior",cor:"#6366f1"},
+    {nome:"Volume",val:last.volume.toLocaleString("pt-BR"),desc:last.volume>100000?"Alto":"Baixo",cor:"#58a6ff"},
+  ];
+  document.getElementById("ind-lista").innerHTML=itens.map(it=>`
+    <div class="ind-row">
+      <div><div class="ind-name">${it.nome}</div><div class="ind-desc">${it.desc}</div></div>
+      <div class="ind-val" style="color:${it.cor}">${it.val}</div>
+    </div>`).join("");
+
+  const prices=candles.slice(-20).map(c=>c.close);
+  const sup=Math.min(...prices).toFixed(dp),res=Math.max(...prices).toFixed(dp);
+  document.getElementById("sr-lista").innerHTML=`
+    <div class="sr-row" style="border-color:#26a17b40;background:#052e1c1a">
+      <span>🟢 Suporte</span><span class="ind-val" style="color:#26a17b">${sup}</span>
+    </div>
+    <div class="sr-row" style="border-color:#ef444440;background:#1f0a0a1a">
+      <span>🔴 Resistência</span><span class="ind-val" style="color:#ef4444">${res}</span>
+    </div>`;
+}
+
+function renderAll(){
+  atualizarPreco();
+  desenharMain();desenharVol();desenharRsi();
+  atualizarSinal();atualizarAnalise();atualizarIndicadores();
+}
+
+function setTab(id){
+  document.querySelectorAll(".tab-content").forEach(el=>el.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(el=>el.classList.remove("active"));
+  document.getElementById("tab-"+id).classList.add("active");
+  event.target.classList.add("active");
+  if(id==="chart"){desenharMain();desenharVol();desenharRsi();}
+}
+
+function setTf(btn,tf){
+  document.querySelectorAll(".tf-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  tempoGrafico=tf;
+  buscarDadosAPI();
+}
+
+const ativosEl=document.getElementById("ativos");
+ATIVOS.forEach((a,i)=>{
+  const btn=document.createElement("button");
+  btn.className="ativo-btn"+(i===0?" active":"");
+  btn.textContent=a.id;
+  btn.onclick=()=>{
+    ativoIdx=i;
+    document.querySelectorAll(".ativo-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    buscarDadosAPI();
+  };
+  ativosEl.appendChild(btn);
+});
+
+setInterval(()=>document.getElementById("relogio").textContent=new Date().toLocaleTimeString("pt-BR"),1000);
+setInterval(buscarDadosAPI, 60000); // Atualiza a cada 1 minuto
+
+window.addEventListener("resize",()=>{desenharMain();desenharVol();desenharRsi();});
+
+// Inicializar
+buscarDadosAPI();
+</script>
+</body>
+</html>
+ 
