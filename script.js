@@ -991,3 +991,145 @@ sinal.motivo;
 
 
 }
+
+// ── Entrada / Stop / Alvo ──
+
+function atualizarEntrada(){
+
+const ativo=ATIVOS[ativoIdx];
+
+const dp=ativo.step<1?4:2;
+
+
+const grid=document.getElementById("entrada-grid");
+
+
+grid.style.display=
+sinal.tipo!=="AGUARDAR"
+?
+"grid"
+:
+"none";
+
+
+
+document.getElementById("entrada-val").textContent=
+sinal.entrada.toFixed(dp);
+
+
+document.getElementById("stop-val").textContent=
+sinal.stop.toFixed(dp);
+
+
+document.getElementById("alvo-val").textContent=
+sinal.alvo.toFixed(dp);
+
+
+}
+
+
+
+
+// ── Análise completa ──
+
+function atualizarAnalise(){
+
+const last=candles[candles.length-1];
+
+if(!last)return;
+
+
+const set=(id,txt,cor)=>{
+
+const el=document.getElementById(id);
+
+el.textContent=txt;
+
+el.style.color=cor;
+
+};
+
+
+
+set(
+"a-tendencia",
+last.ma9>last.ma21?
+"ALTA ▲":
+"BAIXA ▼",
+last.ma9>last.ma21?
+"#26a17b":
+"#ef4444"
+);
+
+
+
+set(
+"a-rsi",
+`${last.rsi.toFixed(1)} — ${
+last.rsi>70?
+"Sobrecomprado":
+last.rsi<30?
+"Sobrevendido":
+"Neutro"
+}`,
+last.rsi>70?
+"#ef4444":
+last.rsi<30?
+"#26a17b":
+"#f59e0b"
+);
+
+
+
+set(
+"a-macd",
+last.macd>last.signal?
+"Acima da signal ▲":
+"Abaixo da signal ▼",
+last.macd>last.signal?
+"#26a17b":
+"#ef4444"
+);
+
+
+
+set(
+"a-boll",
+last.close>last.bb_upper?
+"Acima da banda":
+last.close<last.bb_lower?
+"Abaixo da banda":
+"Dentro das bandas",
+last.close>last.bb_upper?
+"#ef4444":
+last.close<last.bb_lower?
+"#26a17b":
+"#8b949e"
+);
+
+
+
+set(
+"a-candle",
+last.close>last.open?
+"Alta 🟢":
+"Baixa 🔴",
+last.close>last.open?
+"#26a17b":
+"#ef4444"
+);
+
+
+
+set(
+"a-vol",
+last.volume>1000?
+"Alto 🔊":
+"Baixo 🔇",
+last.volume>1000?
+"#58a6ff":
+"#8b949e"
+);
+
+
+}
