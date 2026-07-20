@@ -1,3 +1,4 @@
+
 const API_KEY = "f2c71f3ac827461787c0cf240d6b9314";
 const API_URL = "https://api.twelvedata.com";
 
@@ -14,6 +15,62 @@ let candles=[];
 let sinal=null;
 
 
+// ── Buscar candles reais Twelve Data ──
+
+async function buscarCandlesAPI(){
+
+  const resposta = await fetch(
+    `${API_URL}/time_series?symbol=PETR4&interval=1min&outputsize=60&apikey=${API_KEY}`
+  );
+
+  const dados = await resposta.json();
+
+
+  if(!dados.values){
+
+    console.log("Erro API:", dados);
+
+    return [];
+
+  }
+
+
+  return dados.values.reverse().map(c=>({
+
+    time:c.datetime.slice(11,16),
+
+    open:Number(c.open),
+
+    high:Number(c.high),
+
+    low:Number(c.low),
+
+    close:Number(c.close),
+
+    volume:Number(c.volume || 0),
+
+    ma9:0,
+
+    ma21:0,
+
+    rsi:50,
+
+    macd:0,
+
+    signal:0,
+
+    bb_upper:0,
+
+    bb_lower:0,
+
+    bb_mid:0
+
+  }));
+
+}
+
+
+
 // ── Gerar candles ──
 
 function gerarCandles(base,step,n=60){
@@ -25,37 +82,61 @@ function gerarCandles(base,step,n=60){
   for(let i=n;i>=0;i--){
 
     const vol=(Math.random()-0.48)*step*8;
+
     const open=preco;
+
     const close=open+vol;
 
     const high=Math.max(open,close)+Math.random()*step*3;
+
     const low=Math.min(open,close)-Math.random()*step*3;
 
     const t=new Date(now-i*60000);
 
+
     arr.push({
+
       time:t.toTimeString().slice(0,5),
+
       open,
+
       high,
+
       low,
+
       close,
+
       volume:Math.floor(200+Math.random()*1800),
+
       ma9:0,
+
       ma21:0,
+
       rsi:50,
+
       macd:0,
+
       signal:0,
+
       bb_upper:0,
+
       bb_lower:0,
+
       bb_mid:0
+
     });
 
+
     preco=close;
+
   }
+
 
   return calcIndicadores(arr);
 
 }
+
+
 
 
 
