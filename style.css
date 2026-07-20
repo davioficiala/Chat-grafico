@@ -134,3 +134,169 @@ font-weight:800;
 .sinal-forca{
 font-size:10px;
 }
+
+/* Tabs */
+
+.tabs{
+display:flex;
+border-bottom:1px solid #30363d;
+background:#161b22;
+}
+
+.tab-btn{
+flex:1;
+padding:9px 4px;
+border:none;
+background:transparent;
+color:#8b949e;
+font-size:11px;
+font-weight:600;
+cursor:pointer;
+text-transform:uppercase;
+letter-spacing:.5px;
+border-bottom:2px solid transparent;
+transition:all .15s;
+}
+
+.tab-btn.active{
+color:#e6edf3;
+border-bottom-color:#58a6ff;
+}
+
+
+/* Content */
+
+main{
+flex:1;
+padding:12px;
+overflow-y:auto;
+}
+
+.tab-content{
+display:none;
+}
+
+.tab-content.active{
+display:block;
+}
+
+
+/* Chart */
+
+.tf-row{
+display:flex;
+gap:6px;
+margin-bottom:10px;
+align-items:center;
+}
+
+.tf-btn{
+padding:3px 10px;
+border-radius:5px;
+border:1px solid #30363d;
+background:transparent;
+color:#8b949e;
+font-size:11px;
+cursor:pointer;
+transition:all .15s;
+}
+
+.tf-btn.active{
+border-color:#58a6ff;
+background:#1f3a5e;
+color:#58a6ff;
+}
+
+
+.chart-box{
+background:#0d1117;
+border-radius:8px;
+border:1px solid #30363d;
+padding:10px 6px 6px;
+margin-bottom:10px;
+}
+
+.chart-title{
+font-size:10px;
+color:#8b949e;
+margin-bottom:6px;
+margin-left:4px;
+}
+
+canvas{
+display:block;
+width:100%;
+}
+
+.legend{
+display:flex;
+gap:12px;
+padding:4px 6px;
+flex-wrap:wrap;
+margin-top:4px;
+}
+
+.leg-item{
+display:flex;
+align-items:center;
+gap:4px;
+font-size:10px;
+color:#8b949e;
+}
+
+.leg-dot{
+width:10px;
+height:3px;
+border-radius:2px;
+display:inline-block;
+}
+
+
+/* IA tab */
+
+.sinal-card{
+border-radius:12px;
+padding:18px;
+text-align:center;
+border:2px solid;
+margin-bottom:12px;
+}
+
+.sinal-main{
+font-size:36px;
+font-weight:900;
+letter-spacing:2px;
+margin:6px 0;
+}
+
+.forca-bar-wrap{
+max-width:260px;
+margin:10px auto;
+}
+
+.forca-label{
+display:flex;
+justify-content:space-between;
+font-size:10px;
+color:#8b949e;
+margin-bottom:4px;
+}
+
+.forca-track{
+background:#21262d;
+border-radius:10px;
+height:8px;
+overflow:hidden;
+}
+
+.forca-fill{
+height:100%;
+border-radius:10px;
+transition:width .5s;
+}
+
+.sinal-motivo{
+font-size:11px;
+color:#8b949e;
+margin-top:8px;
+}
