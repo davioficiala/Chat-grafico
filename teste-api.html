@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Teste Twelve Data</title>
+</head>
+
+<body>
+
+<h2>Teste API Twelve Data</h2>
+
+<pre id="resultado">Carregando...</pre>
+
+
+<script>
+
+const API_KEY = "SUA_CHAVE_AQUI";
+
+const API_URL = "https://api.twelvedata.com";
+
+
+fetch(`${API_URL}/time_series?symbol=PETR4&interval=1min&outputsize=10&apikey=${API_KEY}`)
+
+.then(res => res.json())
+
+.then(dados => {
+
+document.getElementById("resultado").textContent =
+JSON.stringify(dados,null,2);
+
+console.log(dados);
+
+})
+
+.catch(erro=>{
+
+document.getElementById("resultado").textContent =
+"Erro: "+erro;
+
+});
+
+</script>
+
+</body>
+</html>
