@@ -1,3 +1,7 @@
+const API_KEY = "f2c71f3ac827461787c0cf240d6b9314";
+const API_URL = "https://api.twelvedata.com";
+
+
 const ATIVOS=[
   {id:"WDO",label:"Mini Dólar (WDO)",base:5.72,step:0.0005},
   {id:"WIN",label:"Mini Índice (WIN)",base:132500,step:50},
