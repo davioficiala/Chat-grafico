@@ -300,3 +300,151 @@ font-size:11px;
 color:#8b949e;
 margin-top:8px;
 }
+
+/* Entrada */
+
+.entrada-grid{
+display:grid;
+grid-template-columns:1fr 1fr 1fr;
+gap:8px;
+margin-bottom:12px;
+}
+
+.entrada-box{
+background:#161b22;
+border:1px solid #30363d;
+border-radius:10px;
+padding:12px;
+text-align:center;
+}
+
+.entrada-label{
+font-size:10px;
+color:#8b949e;
+}
+
+.entrada-val{
+font-size:13px;
+font-weight:700;
+font-family:monospace;
+margin-top:2px;
+}
+
+
+/* Análise */
+
+.analise-card{
+background:#161b22;
+border:1px solid #30363d;
+border-radius:10px;
+padding:14px;
+margin-bottom:12px;
+}
+
+.analise-title{
+font-weight:700;
+font-size:13px;
+margin-bottom:10px;
+}
+
+.analise-row{
+display:flex;
+justify-content:space-between;
+border-bottom:1px solid #21262d;
+padding:7px 0;
+font-size:12px;
+}
+
+.analise-row:last-child{
+border-bottom:none;
+}
+
+.analise-key{
+color:#8b949e;
+}
+
+.analise-val{
+font-weight:600;
+}
+
+
+/* Aviso */
+
+.aviso{
+background:#1c1200;
+border:1px solid #f59e0b40;
+border-radius:10px;
+padding:12px;
+}
+
+.aviso-title{
+font-size:11px;
+color:#f59e0b;
+font-weight:600;
+margin-bottom:4px;
+}
+
+.aviso-txt{
+font-size:11px;
+color:#8b949e;
+line-height:1.6;
+}
+
+
+/* Indicadores */
+
+.ind-title{
+font-weight:700;
+font-size:12px;
+color:#8b949e;
+text-transform:uppercase;
+letter-spacing:1px;
+margin-bottom:8px;
+}
+
+.ind-row{
+background:#161b22;
+border:1px solid #30363d;
+border-radius:10px;
+padding:12px 14px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:8px;
+}
+
+.ind-name{
+font-size:13px;
+font-weight:700;
+}
+
+.ind-desc{
+font-size:11px;
+color:#8b949e;
+}
+
+.ind-val{
+font-size:16px;
+font-weight:800;
+font-family:monospace;
+}
+
+.sr-row{
+border-radius:10px;
+padding:12px 14px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:8px;
+border:1px solid;
+}
+
+
+footer{
+background:#161b22;
+border-top:1px solid #30363d;
+padding:10px 16px;
+text-align:center;
+font-size:10px;
+color:#8b949e;
+}
