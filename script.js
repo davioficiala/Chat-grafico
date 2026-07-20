@@ -820,3 +820,174 @@ document.getElementById("rsi-title").textContent=
 
 
 }
+
+// ── Atualizar UI ──
+
+function atualizarPreco(){
+
+const ativo=ATIVOS[ativoIdx];
+
+const last=candles[candles.length-1];
+
+const prev=candles[candles.length-2];
+
+
+if(!last)return;
+
+
+const dp=ativo.step<1?4:2;
+
+
+const diff=prev?
+last.close-prev.close:
+0;
+
+
+const pct=prev?
+((diff/prev.close)*100):
+0;
+
+
+const alta=diff>=0;
+
+
+
+document.getElementById("ativo-label").textContent=
+ativo.label;
+
+
+document.getElementById("preco-atual").textContent=
+last.close.toFixed(dp);
+
+
+document.getElementById("preco-atual").style.color=
+alta?
+"#26a17b":
+"#ef4444";
+
+
+
+document.getElementById("preco-diff").textContent=
+`${alta?"▲":"▼"} ${Math.abs(diff).toFixed(dp)} (${alta?"+":""}${pct.toFixed(2)}%)`;
+
+
+
+document.getElementById("preco-diff").style.color=
+alta?
+"#26a17b":
+"#ef4444";
+
+
+
+document.getElementById("preco-hl").textContent=
+`H: ${last.high.toFixed(dp)} · L: ${last.low.toFixed(dp)}`;
+
+
+
+document.getElementById("candle-count").textContent=
+`${Math.min(candles.length,40)} candles`;
+
+
+
+}
+
+
+
+
+function atualizarSinal(){
+
+if(!sinal)return;
+
+
+const cor=
+sinal.tipo==="COMPRA"
+?
+"#26a17b"
+:
+sinal.tipo==="VENDA"
+?
+"#ef4444"
+:
+"#f59e0b";
+
+
+
+const bg=
+sinal.tipo==="COMPRA"
+?
+"#052e1c"
+:
+sinal.tipo==="VENDA"
+?
+"#1f0a0a"
+:
+"#1c1200";
+
+
+
+const txt=
+sinal.tipo==="COMPRA"
+?
+"⬆ COMPRA"
+:
+sinal.tipo==="VENDA"
+?
+"⬇ VENDA"
+:
+"⏸ AGUARDAR";
+
+
+
+// Badge
+
+document.getElementById("sinal-badge").style.borderColor=cor;
+
+document.getElementById("sinal-badge").style.background=bg;
+
+
+document.getElementById("sinal-tipo").textContent=
+sinal.tipo;
+
+
+document.getElementById("sinal-tipo").style.color=cor;
+
+
+document.getElementById("sinal-forca-top").textContent=
+sinal.forca+"%";
+
+
+document.getElementById("sinal-forca-top").style.color=cor;
+
+
+
+
+// Card IA
+
+document.getElementById("sinal-card").style.borderColor=cor;
+
+document.getElementById("sinal-card").style.background=bg;
+
+
+document.getElementById("sinal-main").textContent=txt;
+
+document.getElementById("sinal-main").style.color=cor;
+
+
+document.getElementById("sinal-forca-pct").textContent=
+sinal.forca+"%";
+
+
+document.getElementById("forca-fill").style.width=
+sinal.forca+"%";
+
+
+document.getElementById("forca-fill").style.background=
+cor;
+
+
+document.getElementById("sinal-motivo").textContent=
+sinal.motivo;
+
+
+
+}
