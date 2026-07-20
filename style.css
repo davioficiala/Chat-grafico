@@ -1,1 +1,136 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Segoe UI',Arial,sans-serif;
+}
 
+body{
+background:#0d1117;
+color:#e6edf3;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+}
+
+
+/* Header */
+header{
+background:#161b22;
+border-bottom:1px solid #30363d;
+padding:10px 16px;
+}
+
+.header-top{
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:10px;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.logo-title{
+font-weight:700;
+font-size:16px;
+}
+
+.logo-sub{
+font-size:10px;
+color:#8b949e;
+}
+
+.relogio{
+font-family:monospace;
+font-size:14px;
+color:#58a6ff;
+text-align:right;
+}
+
+.relogio-sub{
+font-size:10px;
+color:#8b949e;
+}
+
+
+/* Ativos */
+
+.ativos{
+display:flex;
+gap:6px;
+overflow-x:auto;
+padding-bottom:2px;
+}
+
+.ativo-btn{
+padding:4px 12px;
+border-radius:6px;
+border:1px solid #30363d;
+background:transparent;
+color:#8b949e;
+font-size:11px;
+font-weight:600;
+cursor:pointer;
+white-space:nowrap;
+transition:all .15s;
+}
+
+.ativo-btn.active{
+border-color:#58a6ff;
+background:#1f3a5e;
+color:#58a6ff;
+}
+
+
+/* Preço */
+
+.preco-bar{
+background:#161b22;
+border-bottom:1px solid #30363d;
+padding:10px 16px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+
+.preco-atual{
+font-size:26px;
+font-weight:800;
+font-family:monospace;
+}
+
+.preco-diff{
+font-size:13px;
+font-weight:700;
+}
+
+.preco-hl{
+font-size:10px;
+color:#8b949e;
+margin-top:2px;
+}
+
+.sinal-badge{
+padding:7px 14px;
+border-radius:8px;
+text-align:center;
+border:1px solid;
+}
+
+.sinal-label{
+font-size:10px;
+color:#8b949e;
+}
+
+.sinal-tipo{
+font-size:14px;
+font-weight:800;
+}
+
+.sinal-forca{
+font-size:10px;
+}
