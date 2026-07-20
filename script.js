@@ -296,3 +296,288 @@ function analisarIA(c){
   };
 
 }
+
+
+// ── Desenhar gráficos canvas ──
+
+function desenharMain(){
+
+const cv=document.getElementById("cvMain");
+
+cv.width=cv.offsetWidth||360;
+
+const ctx=cv.getContext("2d");
+
+const d=candles.slice(-40);
+
+const W=cv.width;
+const H=cv.height||220;
+
+
+ctx.clearRect(0,0,W,H);
+
+
+const prices=d.flatMap(c=>[
+c.high,
+c.low,
+c.ma9||c.close,
+c.ma21||c.close,
+c.bb_upper||c.close,
+c.bb_lower||c.close
+]).filter(v=>v>0);
+
+
+const minP=Math.min(...prices);
+const maxP=Math.max(...prices);
+
+const range=maxP-minP||1;
+
+
+const pad={
+t:10,
+b:20,
+l:48,
+r:8
+};
+
+
+const cW=W-pad.l-pad.r;
+const cH=H-pad.t-pad.b;
+
+
+const toY=v=>
+pad.t+cH-(v-minP)/range*cH;
+
+
+const bw=Math.max(2,Math.floor(cW/d.length)-2);
+
+const bx=i=>
+pad.l+i*(cW/d.length)+cW/d.length/2;
+
+
+
+// Grid
+
+ctx.strokeStyle="#21262d";
+ctx.lineWidth=1;
+
+
+for(let i=0;i<4;i++){
+
+const y=pad.t+i*cH/3;
+
+ctx.beginPath();
+ctx.moveTo(pad.l,y);
+ctx.lineTo(W-pad.r,y);
+ctx.stroke();
+
+}
+
+
+
+// Bollinger
+
+ctx.beginPath();
+
+ctx.strokeStyle="#6366f130";
+ctx.lineWidth=1;
+ctx.setLineDash([4,2]);
+
+
+d.forEach((c,i)=>{
+
+if(c.bb_upper>0){
+
+const x=bx(i);
+const y=toY(c.bb_upper);
+
+i===0||!d[i-1].bb_upper
+?
+ctx.moveTo(x,y)
+:
+ctx.lineTo(x,y);
+
+}
+
+});
+
+
+ctx.stroke();
+
+
+ctx.beginPath();
+
+
+d.forEach((c,i)=>{
+
+if(c.bb_lower>0){
+
+const x=bx(i);
+const y=toY(c.bb_lower);
+
+i===0||!d[i-1].bb_lower
+?
+ctx.moveTo(x,y)
+:
+ctx.lineTo(x,y);
+
+}
+
+});
+
+
+ctx.stroke();
+
+
+ctx.setLineDash([]);
+
+
+
+// MA9
+
+ctx.beginPath();
+
+ctx.strokeStyle="#f59e0b";
+ctx.lineWidth=1.5;
+
+
+d.forEach((c,i)=>{
+
+if(c.ma9>0){
+
+const x=bx(i);
+const y=toY(c.ma9);
+
+i===0
+?
+ctx.moveTo(x,y)
+:
+ctx.lineTo(x,y);
+
+}
+
+});
+
+
+ctx.stroke();
+
+
+
+// MA21
+
+ctx.beginPath();
+
+ctx.strokeStyle="#818cf8";
+ctx.lineWidth=1.5;
+
+
+d.forEach((c,i)=>{
+
+if(c.ma21>0){
+
+const x=bx(i);
+const y=toY(c.ma21);
+
+i===0
+?
+ctx.moveTo(x,y)
+:
+ctx.lineTo(x,y);
+
+}
+
+});
+
+
+ctx.stroke();
+
+
+
+// Candles
+
+d.forEach((c,i)=>{
+
+const alta=c.close>=c.open;
+
+const cor=alta?
+"#26a17b":
+"#ef4444";
+
+
+const x=bx(i);
+
+const yH=toY(c.high);
+const yL=toY(c.low);
+
+const yO=toY(c.open);
+const yC=toY(c.close);
+
+
+ctx.strokeStyle=cor;
+ctx.lineWidth=1;
+
+ctx.beginPath();
+ctx.moveTo(x,yH);
+ctx.lineTo(x,yL);
+ctx.stroke();
+
+
+ctx.fillStyle=cor;
+
+const bodyY=Math.min(yO,yC);
+
+const bodyH=Math.max(Math.abs(yC-yO),1);
+
+
+ctx.fillRect(
+x-bw/2,
+bodyY,
+bw,
+bodyH
+);
+
+
+});
+
+
+
+// Labels
+
+ctx.fillStyle="#8b949e";
+ctx.font="9px monospace";
+ctx.textAlign="right";
+
+
+const ativo=ATIVOS[ativoIdx];
+
+
+for(let i=0;i<=3;i++){
+
+const v=minP+range*i/3;
+
+ctx.fillText(
+v.toFixed(ativo.step<1?3:1),
+pad.l-4,
+pad.t+cH-i*cH/3+3
+);
+
+}
+
+
+ctx.textAlign="center";
+
+
+d.forEach((c,i)=>{
+
+if(i%10===0)
+
+ctx.fillText(
+c.time,
+bx(i),
+H-4
+);
+
+});
+
+
+}
