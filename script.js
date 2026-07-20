@@ -581,3 +581,242 @@ H-4
 
 
 }
+
+// ── Volume ──
+
+function desenharVol(){
+
+const cv=document.getElementById("cvVol");
+
+cv.width=cv.offsetWidth||360;
+
+const ctx=cv.getContext("2d");
+
+const d=candles.slice(-40);
+
+const W=cv.width;
+const H=cv.height||60;
+
+
+ctx.clearRect(0,0,W,H);
+
+
+const maxV=Math.max(...d.map(c=>c.volume))||1;
+
+const pad={
+l:8,
+r:8
+};
+
+const cW=W-pad.l-pad.r;
+
+
+d.forEach((c,i)=>{
+
+const x=pad.l+i*(cW/d.length);
+
+const bw=Math.max(1,cW/d.length-2);
+
+const bh=c.volume/maxV*(H-4);
+
+
+ctx.fillStyle=
+c.close>=c.open
+?
+"#26a17b66"
+:
+"#ef444466";
+
+
+ctx.fillRect(
+x,
+H-bh,
+bw,
+bh
+);
+
+
+});
+
+
+}
+
+
+
+// ── RSI ──
+
+function desenharRsi(){
+
+const cv=document.getElementById("cvRsi");
+
+cv.width=cv.offsetWidth||360;
+
+
+const ctx=cv.getContext("2d");
+
+const d=candles.slice(-40);
+
+
+const W=cv.width;
+const H=cv.height||70;
+
+
+ctx.clearRect(0,0,W,H);
+
+
+const pad={
+l:28,
+r:8,
+t:4,
+b:4
+};
+
+
+const cW=W-pad.l-pad.r;
+const cH=H-pad.t-pad.b;
+
+
+const toY=v=>
+pad.t+cH-(v/100)*cH;
+
+
+
+// Zonas
+
+ctx.fillStyle="#ef444412";
+
+ctx.fillRect(
+pad.l,
+pad.t,
+cW,
+toY(70)-pad.t
+);
+
+
+ctx.fillStyle="#26a17b12";
+
+ctx.fillRect(
+pad.l,
+toY(30),
+cW,
+cH-(toY(30)-pad.t)
+);
+
+
+
+// Linhas
+
+[30,50,70].forEach(v=>{
+
+
+ctx.strokeStyle=
+v===50
+?
+"#30363d"
+:
+"#ef444430";
+
+
+if(v===30)
+ctx.strokeStyle="#26a17b30";
+
+
+ctx.lineWidth=1;
+
+ctx.setLineDash([4,2]);
+
+
+ctx.beginPath();
+
+ctx.moveTo(
+pad.l,
+toY(v)
+);
+
+
+ctx.lineTo(
+W-pad.r,
+toY(v)
+);
+
+
+ctx.stroke();
+
+
+});
+
+
+ctx.setLineDash([]);
+
+
+
+// Barras RSI
+
+const bw=Math.max(1,cW/d.length-2);
+
+
+d.forEach((c,i)=>{
+
+
+const x=pad.l+i*(cW/d.length);
+
+
+const cor=
+c.rsi>70
+?
+"#ef4444"
+:
+c.rsi<30
+?
+"#26a17b"
+:
+"#6366f1";
+
+
+const y=toY(c.rsi);
+
+const bh=H-pad.b-y;
+
+
+ctx.fillStyle=cor+"aa";
+
+
+ctx.fillRect(
+x,
+y,
+bw,
+bh
+);
+
+
+});
+
+
+// Valores
+
+ctx.fillStyle="#8b949e";
+
+ctx.font="9px monospace";
+
+ctx.textAlign="right";
+
+
+[30,50,70].forEach(v=>{
+
+ctx.fillText(
+v,
+pad.l-3,
+toY(v)+3
+);
+
+});
+
+
+const last=candles[candles.length-1];
+
+
+document.getElementById("rsi-title").textContent=
+`RSI (14) — ${last?last.rsi.toFixed(1):"--"}`;
+
+
+}
