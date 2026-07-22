@@ -1025,11 +1025,9 @@ sinal.motivo;
 // FIM PARTE 5
 // ===============================
 
-
-
-  
-
-
+// ===============================
+// PARTE 6
+// ===============================
 
 
 // ── Entrada / Stop / Alvo ──
@@ -1174,6 +1172,7 @@ last.volume>1000?
 
 }
 
+
 // ── Indicadores ──
 
 function atualizarIndicadores(){
@@ -1229,54 +1228,14 @@ desc:"Volume"
 ];
 
 
-document.getElementById("ind-lista").innerHTML=
-itens.map(it=>`
+// ===============================
+// FIM PARTE 6 parei parte 6
+// ===============================
 
-<div class="ind-row">
-
-<div>
-
-<div class="ind-name">
-${it.nome}
-</div>
-
-<div class="ind-desc">
-${it.desc}
-</div>
-
-</div>
-
-
-<div class="ind-val">
-${it.val}
-</div>
-
-
-</div>
-
-`).join("");
+  
 
 
 
-const prices=candles
-.slice(-20)
-.map(c=>c.close);
-
-
-const sup=Math.min(...prices).toFixed(dp);
-
-const res=Math.max(...prices).toFixed(dp);
-
-
-
-document.getElementById("sr-lista").innerHTML=`
-
-<div class="sr-row">
-
-
-
-
-###########
 
 <span>
 🟢 Suporte
