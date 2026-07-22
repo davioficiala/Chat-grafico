@@ -1173,6 +1173,7 @@ last.volume>1000?
 }
 
 
+
 // ── Indicadores ──
 
 function atualizarIndicadores(){
@@ -1227,6 +1228,49 @@ desc:"Volume"
 
 ];
 
+
+// Lista indicadores
+
+document.getElementById("ind-lista").innerHTML=
+itens.map(it=>`
+
+<div class="ind-row">
+
+<div>
+
+<div class="ind-name">
+${it.nome}
+</div>
+
+<div class="ind-desc">
+${it.desc}
+</div>
+
+</div>
+
+<div class="ind-val">
+${it.val}
+</div>
+
+</div>
+
+`).join("");
+
+
+
+// Suporte e resistência
+
+const prices=candles
+.slice(-20)
+.map(c=>c.close);
+
+
+const sup=Math.min(...prices).toFixed(dp);
+
+const res=Math.max(...prices).toFixed(dp);
+
+
+
 document.getElementById("sr-lista").innerHTML=`
 
 <div class="sr-row">
@@ -1257,8 +1301,6 @@ ${res}
 `;
 
 }
-  
-
 
 // ===============================
 // FIM PARTE 6 parei parte 6
