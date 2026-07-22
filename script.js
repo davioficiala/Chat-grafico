@@ -240,6 +240,174 @@ function calcIndicadores(c){
 // FIM PARTE 1
 // ===============================
 
+
+
+// ===============================
+// FIM PARTE 1
+// ===============================
+
+
+// ===============================
+// API TEMPO REAL
+// ===============================
+
+let candleAtual = null;
+
+
+// Buscar preço atual Twelve Data
+
+async function buscarPrecoTempoReal(){
+
+const ativo = ATIVOS[ativoIdx];
+
+
+const resposta = await fetch(
+`${API_URL}/quote?symbol=${ativo.id}&apikey=${API_KEY}`
+);
+
+
+const dados = await resposta.json();
+
+
+if(!dados.close){
+
+console.log("Erro API tempo real:", dados);
+
+return null;
+
+}
+
+
+return Number(dados.close);
+
+
+}
+
+
+
+// Atualizar candle aberto
+
+function atualizarCandle(preco){
+
+
+const agora = new Date();
+
+const minuto =
+agora.toTimeString().slice(0,5);
+
+
+
+if(!candleAtual || candleAtual.time !== minuto){
+
+
+candleAtual={
+
+time:minuto,
+
+open:preco,
+
+high:preco,
+
+low:preco,
+
+close:preco,
+
+volume:0,
+
+ma9:0,
+
+ma21:0,
+
+rsi:50,
+
+macd:0,
+
+signal:0,
+
+bb_upper:0,
+
+bb_lower:0,
+
+bb_mid:0
+
+};
+
+
+candles.push(candleAtual);
+
+
+
+if(candles.length>60){
+
+candles.shift();
+
+}
+
+
+
+}else{
+
+
+candleAtual.high =
+Math.max(candleAtual.high,preco);
+
+
+candleAtual.low =
+Math.min(candleAtual.low,preco);
+
+
+candleAtual.close = preco;
+
+
+}
+
+
+
+// Recalcula indicadores
+
+candles = calcIndicadores(candles);
+
+
+// Atualiza IA
+
+sinal = analisarIA(candles);
+
+
+// Atualiza tela
+
+renderAll();
+
+
+}
+
+
+
+// Loop de atualização
+
+setInterval(async()=>{
+
+
+const preco =
+await buscarPrecoTempoReal();
+
+
+if(preco){
+
+atualizarCandle(preco);
+
+}
+
+
+},5000);
+
+
+
+// ===============================
+// FIM API TEMPO REAL
+// ===============================
+
+
+
 // ===============================
 // PARTE 2
 // ===============================
