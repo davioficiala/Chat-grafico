@@ -1307,6 +1307,9 @@ ${res}
 // ===============================
 
 
+// ===============================
+// PARTE 7 - API REAL
+// ===============================
 
 
 // ── Render geral ──
@@ -1330,7 +1333,6 @@ atualizarAnalise();
 atualizarIndicadores();
 
 }
-
 
 
 
@@ -1401,16 +1403,27 @@ btn.textContent=a.id;
 
 
 
-btn.onclick=()=>{
+btn.onclick=async()=>{
 
 
 ativoIdx=i;
 
 
-candles=gerarCandles(
-a.base,
-a.step
-);
+// Buscar dados reais API
+
+candles=await buscarCandlesAPI(a.id);
+
+
+if(!candles.length){
+
+console.log("Falha API");
+
+return;
+
+}
+
+
+candles=calcIndicadores(candles);
 
 
 sinal=analisarIA(candles);
@@ -1453,58 +1466,23 @@ new Date().toLocaleTimeString("pt-BR");
 
 
 
+
 // ── Atualização automática ──
 
-setInterval(()=>{
+setInterval(async()=>{
 
 
 const ativo=ATIVOS[ativoIdx];
 
-const last=candles[candles.length-1];
 
-
-const close=
-last.close+
-(Math.random()-0.48)*ativo.step*8;
+const novos=await buscarCandlesAPI(ativo.id);
 
 
 
-const novo={
-
-time:new Date()
-.toTimeString()
-.slice(0,5),
-
-open:last.close,
-
-high:Math.max(last.close,close),
-
-low:Math.min(last.close,close),
-
-close,
-
-volume:Math.floor(
-200+
-Math.random()*1800
-),
-
-ma9:0,
-ma21:0,
-rsi:50,
-macd:0,
-signal:0,
-bb_upper:0,
-bb_lower:0,
-bb_mid:0
-
-};
+if(novos.length){
 
 
-
-candles=calcIndicadores([
-...candles.slice(-59),
-novo
-]);
+candles=calcIndicadores(novos);
 
 
 sinal=analisarIA(candles);
@@ -1513,34 +1491,76 @@ sinal=analisarIA(candles);
 renderAll();
 
 
-},3000);
+}
+
+
+},60000);
+
 
 
 
 
 // ── Inicialização ──
 
-candles=
-gerarCandles(
-ATIVOS[0].base,
-ATIVOS[0].step
+async function iniciarSistema(){
+
+
+candles=await buscarCandlesAPI(
+ATIVOS[0].id
 );
 
 
-sinal=
-analisarIA(candles);
+
+if(!candles.length){
+
+console.log("API sem dados");
+
+return;
+
+}
+
+
+candles=calcIndicadores(candles);
+
+
+sinal=analisarIA(candles);
+
+
+
+renderAll();
+
+
+}
+
+
+
+iniciarSistema();
+
+
 
 
 
 window.addEventListener(
 "resize",
 ()=>{
+
 desenharMain();
+
 desenharVol();
+
 desenharRsi();
+
 }
+
 );
 
 
+// ===============================
+// FIM PARTE 7
+// ===============================
 
-renderAll();
+
+
+
+
+
