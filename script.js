@@ -1017,6 +1017,10 @@ sinal.motivo;
 
 }
 
+
+
+############
+
 // ── Entrada / Stop / Alvo ──
 
 function atualizarEntrada(){
