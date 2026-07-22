@@ -4,7 +4,7 @@
 // ===============================
 
 const API_KEY = "f2c71f3ac827461787c0cf240d6b9314";
-const API_URL = "https://api.twelvedata.com";
+const API_URL = "https://api.hgbrasil.com/finance?key=suachave";
 
 
 const ATIVOS=[
