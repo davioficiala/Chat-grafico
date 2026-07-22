@@ -1227,15 +1227,9 @@ desc:"Volume"
 
 ];
 
+document.getElementById("sr-lista").innerHTML=`
 
-// ===============================
-// FIM PARTE 6 parei parte 6
-// ===============================
-
-  
-
-
-
+<div class="sr-row">
 
 <span>
 🟢 Suporte
@@ -1263,6 +1257,12 @@ ${res}
 `;
 
 }
+  
+
+
+// ===============================
+// FIM PARTE 6 parei parte 6
+// ===============================
 
 
 
